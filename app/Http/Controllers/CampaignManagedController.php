@@ -84,6 +84,7 @@ class CampaignManagedController extends Controller
         $data->name = $request->name;
         $data->description = $request->description;
         $data->quantity = $request->quantity;
+        $data->quantity_remaining = $request->quantity;
         $data->total = $request->total;
         //$data->start_date = $request->start_date;
         //$data->end_date = $request->end_date;
@@ -122,6 +123,7 @@ class CampaignManagedController extends Controller
         $data->name = $request->name;
         $data->description = $request->description;
         $data->quantity = $request->quantity;
+        $data->quantity_remaining = $request->quantity;
         $data->total = $request->total;
         //$data->start_date = $request->start_date;
         //$data->end_date = $request->end_date;

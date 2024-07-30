@@ -22,6 +22,7 @@ class CampaignManagedResource extends JsonResource
             'description' => $this->description,
             'total' => $this->total,
             'quantity' => $this->quantity,
+            'quantity_remaining' => $this->quantity_remaining,
             'status' => $this->status,
             'start_date' => $this->start_date,
             'num_of_days' => $this->num_of_days,

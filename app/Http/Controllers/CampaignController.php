@@ -82,6 +82,10 @@ class CampaignController extends Controller
             $voucher->campaign_managed_id = $request->campaign_managed_id;
             $voucher->save();
             VoucherGenerated::find($request->voucher_generated_id)->delete();
+            /* Subtract one */
+            $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
+            $campaign_managed->quantity_remaining -= 1;
+            $campaign_managed->save();
             return response()->json([
                 'status' => 1,
                 'message' => 'New User and Campaign created successfully.',
@@ -109,6 +113,10 @@ class CampaignController extends Controller
             $voucher->campaign_managed_id = $request->campaign_managed_id;
             $voucher->save();
             VoucherGenerated::find($request->voucher_generated_id)->delete();
+             /* Subtract one */
+             $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
+             $campaign_managed->quantity_remaining -= 1;
+             $campaign_managed->save();
             return response()->json([
                 'status' => 1,
                 'message' => 'Campaign created successfully.',
@@ -127,6 +135,10 @@ class CampaignController extends Controller
         $voucher->campaign_managed_id = $request->campaign_managed_id;
         $voucher->save();
         VoucherGenerated::find($request->voucher_generated_id)->delete();
+         /* Subtract one */
+         $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
+         $campaign_managed->quantity_remaining -= 1;
+         $campaign_managed->save();
         return response()->json([
             'status' => 1,
             'message' => 'Campaign saved successfully.',

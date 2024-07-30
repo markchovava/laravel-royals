@@ -135,6 +135,10 @@ class VoucherGeneratedController extends Controller
     }
 
     public function store(Request $request){
+        $voucher = VoucherGenerated::where('campaign_managed_id', $request->campaign_managed_id)->first();
+        if(!isset($voucher)) {
+            $voucher->delete();
+        }
         $reward = Reward::where('campaign_managed_id', $request->campaign_managed_id)->first();
         $points = ((int)$request->amount / $reward->price_per_voucher) * $reward->points_per_voucher;
         $code = $this->generateRandomText(12);
@@ -152,6 +156,7 @@ class VoucherGeneratedController extends Controller
         $data->updated_at = now();
         $data->created_at = now();
         $data->save();
+
         return response()->json([
             'status' => 1,
             'message' => 'Voucher created successfully.',

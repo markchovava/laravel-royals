@@ -16,6 +16,7 @@ class CampaignManaged extends Model
         'description',
         'total',
         'quantity',
+        'quantity_remaining',
         'status',
         'start_date',
         'num_of_days',

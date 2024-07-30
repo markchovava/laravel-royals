@@ -19,6 +19,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->string('status')->nullable();
             $table->bigInteger('quantity')->nullable();
+            $table->bigInteger('quantity_remaining')->nullable();
             $table->bigInteger('total')->nullable();
             $table->string('start_date')->nullable();
             $table->integer('num_of_days')->nullable();
