@@ -84,20 +84,46 @@ class CampaignController extends Controller
             VoucherGenerated::find($request->voucher_generated_id)->delete();
             return response()->json([
                 'status' => 1,
-                'message' => 'New User and Campaign created successfully.'
+                'message' => 'New User and Campaign created successfully.',
+                'data' => new CampaignResource($campaign),
             ]);
         }
+        /*  */
         $campaign = Campaign::where('user_id', $user->id)
                     ->where('campaign_managed_id', $request->campaign_managed_id)
                     ->first();
+        if(!isset($campaign)){
+            /* CAMAPAIGN */
+            $campaign = new Campaign();
+            $campaign->campaign_managed_id = $request->campaign_managed_id;
+            $campaign->user_id = $user->id;
+            $campaign->current_points = $request->points;
+            $campaign->current_quantity = $request->quantity;
+            $campaign->reward_id = $reward->id;
+            $campaign->save();
+            /* VOUCHER */
+            $voucher = new VoucherUsed();
+            $voucher->voucher_generated_id = $request->voucher_generated_id;
+            $voucher->code = $request->code;
+            $voucher->points = $request->points;
+            $voucher->campaign_managed_id = $request->campaign_managed_id;
+            $voucher->save();
+            VoucherGenerated::find($request->voucher_generated_id)->delete();
+            return response()->json([
+                'status' => 1,
+                'message' => 'Campaign created successfully.',
+                'data' => new CampaignResource($campaign),
+            ]);
+        }
+        /*  */
         $campaign->current_points += $request->points;
-        $campaign->current_quantity += $request->quantity;
+        $campaign->current_quantity += (int)$request->quantity;
         $campaign->save();
         /* VOUCHER */
         $voucher = new VoucherUsed();
         $voucher->voucher_generated_id = $request->voucher_generated_id;
         $voucher->code = $request->code;
-        $voucher->points = $request->points;
+        $voucher->points = (int)$request->points;
         $voucher->campaign_managed_id = $request->campaign_managed_id;
         $voucher->save();
         VoucherGenerated::find($request->voucher_generated_id)->delete();
@@ -131,7 +157,6 @@ class CampaignController extends Controller
             $voucher->save();
             //  REWARD VOUCHERS 
             $vouchers = VoucherReward::where('campaign_id', $data->id)->where('status', 'Active')->get();
-            Log::info($vouchers);
             if(isset($vouchers)){
                 return response()->json([
                     'status' => 1,

@@ -29,6 +29,19 @@ class CampaignManagedController extends Controller
         ]);
     }
 
+    public function durationUpdate(Request $request, $id){
+        $end_date = date('Y-m-d', strtotime($request->start_date . ' + ' . $request->num_of_days . ' days'));
+        $data = CampaignManaged::find($id);
+        $data->start_date = $request->start_date;
+        $data->end_date = $end_date;
+        $data->num_of_days = $request->num_of_days;
+        $data->save();
+        return response()->json([
+            'status' => 1,
+            'message' => 'Saved successfully.'
+        ]);
+    }
+
     public function indexByUserActive(){
         $user_id = Auth::user()->id;
         $data = CampaignManaged::where('user_id', $user_id)
@@ -72,8 +85,9 @@ class CampaignManagedController extends Controller
         $data->description = $request->description;
         $data->quantity = $request->quantity;
         $data->total = $request->total;
-        $data->start_date = $request->start_date;
-        $data->end_date = $request->end_date;
+        //$data->start_date = $request->start_date;
+        //$data->end_date = $request->end_date;
+        $data->num_of_days = $request->num_pf_days;
         $data->company_name = $request->company_name;
         $data->company_phone = $request->company_phone;
         $data->company_address = $request->company_address;
@@ -109,8 +123,9 @@ class CampaignManagedController extends Controller
         $data->description = $request->description;
         $data->quantity = $request->quantity;
         $data->total = $request->total;
-        $data->start_date = $request->start_date;
-        $data->end_date = $request->end_date;
+        //$data->start_date = $request->start_date;
+        //$data->end_date = $request->end_date;
+        $data->num_of_days = $request->num_of_days;
         $data->company_name = $request->company_name;
         $data->company_phone = $request->company_phone;
         $data->company_address = $request->company_address;
@@ -136,7 +151,6 @@ class CampaignManagedController extends Controller
 
     public function view($id){
         $data = CampaignManaged::with(['user', 'reward'])->find($id);
-        Log::info($data);
         return new CampaignManagedResource($data);
     }
 

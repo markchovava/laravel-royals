@@ -21,6 +21,7 @@ return new class extends Migration
             $table->bigInteger('quantity')->nullable();
             $table->bigInteger('total')->nullable();
             $table->string('start_date')->nullable();
+            $table->integer('num_of_days')->nullable();
             $table->string('end_date')->nullable();
             $table->string('company_name')->nullable();
             $table->string('company_phone')->nullable();

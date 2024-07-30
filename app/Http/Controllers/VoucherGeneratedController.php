@@ -14,7 +14,8 @@ class VoucherGeneratedController extends Controller
 {
 
     public function generateRandomText($length = 9) {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $date = date('Ymdhis');
+        $characters = $date . '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $shuffled = str_shuffle($characters);
         return substr($shuffled, 0, $length);
     }
@@ -39,7 +40,7 @@ class VoucherGeneratedController extends Controller
     public function storeAll(Request $request){
         $user_id = Auth::user()->id;
         for ($i = 0; $i < $request->quantity; $i++) {
-            $code = rand(0, 100000) . date('Ymd') . $this->generateRandomText(7);
+            $code = $this->generateRandomText(12);
             $data = new VoucherGenerated();
             $data->user_id = $user_id;
             $data->code = $code;
@@ -136,7 +137,7 @@ class VoucherGeneratedController extends Controller
     public function store(Request $request){
         $reward = Reward::where('campaign_managed_id', $request->campaign_managed_id)->first();
         $points = ((int)$request->amount / $reward->price_per_voucher) * $reward->points_per_voucher;
-        $code = rand(0, 1000) . date('Ym') . $this->generateRandomText(7);
+        $code = $this->generateRandomText(12);
         $user_id = Auth::user()->id;
         /*  */
         $data = new VoucherGenerated();

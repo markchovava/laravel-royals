@@ -65,6 +65,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     });
     Route::get('/campaign-managed-all', [CampaignManagedController::class, 'indexAll']);
     Route::post('/campaign-managed-status/{id}', [CampaignManagedController::class, 'statusUpdate']);
+    Route::post('/campaign-managed-duration/{id}', [CampaignManagedController::class, 'durationUpdate']);
     Route::get('/campaign-managed-list-by-user', [CampaignManagedController::class, 'indexByUser']);
     Route::get('/campaign-managed-list-by-user-active', [CampaignManagedController::class, 'indexByUserActive']);
     /* ROLE */
