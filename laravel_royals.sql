@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 25, 2024 at 11:10 AM
+-- Generation Time: Jul 30, 2024 at 06:34 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -72,7 +72,8 @@ CREATE TABLE `campaigns` (
 --
 
 INSERT INTO `campaigns` (`id`, `user_id`, `campaign_managed_id`, `reward_id`, `current_quantity`, `current_points`, `created_at`, `updated_at`) VALUES
-(1, 4, 5, 3, 6, 12, '2024-07-05 15:28:24', '2024-07-09 10:29:43');
+(1, 4, 5, 3, 6, 56, '2024-07-05 15:28:24', '2024-07-09 10:29:43'),
+(2, 1, 6, 4, 4, 20, '2024-07-27 08:13:46', '2024-07-30 13:07:41');
 
 -- --------------------------------------------------------
 
@@ -87,8 +88,10 @@ CREATE TABLE `campaign_manageds` (
   `description` longtext DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   `quantity` bigint(20) DEFAULT NULL,
+  `quantity_remaining` bigint(20) DEFAULT NULL,
   `total` bigint(20) DEFAULT NULL,
   `start_date` varchar(255) DEFAULT NULL,
+  `num_of_days` int(11) DEFAULT NULL,
   `end_date` varchar(255) DEFAULT NULL,
   `company_name` varchar(255) DEFAULT NULL,
   `company_phone` varchar(255) DEFAULT NULL,
@@ -103,9 +106,10 @@ CREATE TABLE `campaign_manageds` (
 -- Dumping data for table `campaign_manageds`
 --
 
-INSERT INTO `campaign_manageds` (`id`, `user_id`, `name`, `description`, `status`, `quantity`, `total`, `start_date`, `end_date`, `company_name`, `company_phone`, `company_address`, `company_email`, `company_website`, `created_at`, `updated_at`) VALUES
-(5, 1, 'Pot and Pans', '3gig', 'Active', 11, 11, '2024-07-09', '2024-08-09', '1', '3', '3', '32', '2', '2024-07-04 08:04:27', '2024-07-04 11:50:01'),
-(6, 4, 'TV', 'Tv is', 'Active', 1000, 1000, '2024-07-09', '2024-09-09', 'Company 1', '121212', '4 - 1 Ave., Mabel', 'admin@gmail.com', 'www.a.com', '2024-07-09 07:33:35', '2024-07-09 07:36:09');
+INSERT INTO `campaign_manageds` (`id`, `user_id`, `name`, `description`, `status`, `quantity`, `quantity_remaining`, `total`, `start_date`, `num_of_days`, `end_date`, `company_name`, `company_phone`, `company_address`, `company_email`, `company_website`, `created_at`, `updated_at`) VALUES
+(5, 1, 'Pot and Pans', '3gig', 'Active', 15, 15, 45, '2024-07-01', 10, '2024-07-11', '1', '3', '3', '32', '2', '2024-07-04 08:04:27', '2024-07-30 12:29:14'),
+(6, 4, 'TV', 'Tv is', 'Active', 1000, 1000, 10, '2024-07-09', 7, '2024-09-09', 'Company 1', '121212', '4 - 1 Ave., Mabel', 'admin@gmail.com', 'www.a.com', '2024-07-09 07:33:35', '2024-07-09 07:36:09'),
+(8, 1, 'Abc', 'bn', 'Active', 250, 250, 750, '2024-07-28', 10, '2024-08-07', 'Abc', '123', '1 abc ave', 'a@b.com', 'www.a.com', '2024-07-27 09:10:10', '2024-07-30 12:18:39');
 
 -- --------------------------------------------------------
 
@@ -194,7 +198,7 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (1, 'App\\Models\\User', 1, 'mark@email.com', 'ba714cfde41dfd05525c8516524775a84cbe80fa5dd6b0ab3d505636c623ff2b', '[\"*\"]', NULL, NULL, '2024-07-02 12:39:22', '2024-07-02 12:39:22'),
 (2, 'App\\Models\\User', 1, 'mark@email.com', 'edff56c80d5fbcef202afeb89a37bf242c6067e5c11fc18207f6e8bc05b910e6', '[\"*\"]', NULL, NULL, '2024-07-02 12:41:00', '2024-07-02 12:41:00'),
 (3, 'App\\Models\\User', 1, 'mark@email.com', '0c9fa0a41845b94e5ee9d1267844d36b46e3460db15fed320cd4346b9a898c52', '[\"*\"]', '2024-07-05 09:16:48', NULL, '2024-07-02 12:41:39', '2024-07-05 09:16:48'),
-(7, 'App\\Models\\User', 1, 'mark@email.com', 'e7551d03e45c21b59fa6845465fa927c9efc85b8ffbcb87d2417ca0b56ea4c48', '[\"*\"]', '2024-07-25 06:17:09', NULL, '2024-07-24 16:01:24', '2024-07-25 06:17:09');
+(9, 'App\\Models\\User', 1, 'mark@email.com', '4bd37353e1be322394c780bf69dbf1106d0be1de1f53664b8c79915a2952f0f9', '[\"*\"]', '2024-07-30 14:15:18', NULL, '2024-07-30 08:17:06', '2024-07-30 14:15:18');
 
 -- --------------------------------------------------------
 
@@ -219,7 +223,8 @@ CREATE TABLE `prices` (
 --
 
 INSERT INTO `prices` (`id`, `user_id`, `name`, `slug`, `priority`, `quantity`, `amount`, `created_at`, `updated_at`) VALUES
-(1, 1, 'Maining', 'maining', 1, 100, 100, '2024-07-03 10:27:56', '2024-07-03 14:54:54');
+(1, 1, 'Voucher Price', 'voucher-price', 1, 1, 3, '2024-07-03 10:27:56', '2024-07-27 12:23:04'),
+(3, 1, 'L1 Subscription Price', 'l1-ubscription-price', 2, 1, 500, '2024-07-27 12:25:10', '2024-07-27 12:27:12');
 
 -- --------------------------------------------------------
 
@@ -244,8 +249,9 @@ CREATE TABLE `rewards` (
 --
 
 INSERT INTO `rewards` (`id`, `user_id`, `campaign_managed_id`, `name`, `target_points`, `points_per_voucher`, `price_per_voucher`, `created_at`, `updated_at`) VALUES
-(3, 1, 5, 'Pot', 100, 5, 600, '2024-07-04 08:04:27', '2024-07-04 11:50:01'),
-(4, 4, 6, 'TV', 100, 2, 10, '2024-07-09 07:33:35', '2024-07-09 07:33:35');
+(3, 1, 5, 'Pot', 40, 5, 600, '2024-07-04 08:04:27', '2024-07-30 12:29:14'),
+(4, 4, 6, 'TV', 40, 2, 10, '2024-07-09 07:33:35', '2024-07-09 07:33:35'),
+(6, 1, 8, 'TV', 50, 2, 2000, '2024-07-27 09:10:10', '2024-07-27 09:14:05');
 
 -- --------------------------------------------------------
 
@@ -267,9 +273,9 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `user_id`, `name`, `level`, `created_at`, `updated_at`) VALUES
-(1, 4, 'Customer', 1, '2024-07-03 06:11:21', '2024-07-24 15:28:04'),
-(2, 4, 'Moderator', 2, '2024-07-03 07:07:04', '2024-07-24 15:28:50'),
-(3, 4, 'Manager', 3, '2024-07-24 15:16:12', '2024-07-24 15:28:30'),
+(1, 1, 'Shopper', 1, '2024-07-03 06:11:21', '2024-07-27 12:21:44'),
+(2, 1, 'Issuer', 2, '2024-07-03 07:07:04', '2024-07-27 12:21:57'),
+(3, 1, 'Owner', 3, '2024-07-24 15:16:12', '2024-07-27 12:22:15'),
 (4, 4, 'Admin', 4, '2024-07-24 15:22:52', '2024-07-24 15:29:40');
 
 -- --------------------------------------------------------
@@ -298,7 +304,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `address`, `phone`, `role_level`, `password`, `code`, `email`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'test', 'jpj[\'jjp', '1234545', 1, '$2y$12$9djCUwfwnztapMHvd23qfeEMRb3tFcpjW0TZowJB1U43pnNNFX7Wq', 'qwerty', 'mark@email.com', NULL, NULL, '2024-07-02 11:18:30', '2024-07-04 11:30:41'),
+(1, 'test', 'jpj[\'jjp', '1234567', 1, '$2y$12$9djCUwfwnztapMHvd23qfeEMRb3tFcpjW0TZowJB1U43pnNNFX7Wq', 'qwerty', 'mark@email.com', NULL, NULL, '2024-07-02 11:18:30', '2024-07-26 13:22:42'),
 (3, 'Add', 'asd', '123', 1, '$2y$12$VNdrvGRHisj9bJa.gnRNSuigc.OL9bIboFztiH1CUYZozxW5wFPDu', '12345678', 'ad@gmail.com', NULL, NULL, '2024-07-02 11:30:34', '2024-07-03 08:06:33'),
 (4, 'Mark Chovava', '14949  Tynwald South, Harare, Zimbabwe', '0782210021', 4, '$2y$12$r29Y2j.3o0tXuPPFUISzeOh206jeCLXiJLeiLSgKC6pPw.gBjZFUG', '20240705', 'a@gmail.com', NULL, NULL, '2024-07-05 15:28:24', '2024-07-24 15:15:30');
 
@@ -328,16 +334,12 @@ CREATE TABLE `voucher_generateds` (
 
 INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`, `status`, `receipt_no`, `points`, `amount`, `phone`, `created_at`, `updated_at`) VALUES
 (1013, 4, 6, '73282202407240RfmyZ1', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
-(1014, 4, 6, '4347120240724jNFL2K5', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1015, 4, 6, '1907820240724YnhNUXm', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1016, 4, 6, '959020240724nTw1um0', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
-(1017, 4, 6, '4700020240724QKW5ZAD', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1018, 4, 6, '8302920240724QpZBMOs', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
-(1019, 4, 6, '6595320240724Nz0JesK', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1020, 4, 6, '3011620240724D0lphgK', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1021, 4, 6, '8568720240724bSoMDnF', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1022, 4, 6, '9504420240724S8KAmLw', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
-(1023, 4, 6, '89329202407244kIO1Cv', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1024, 4, 6, '1028020240724QMB9Eir', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1025, 4, 6, '4248120240724s5r1xXV', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
 (1026, 4, 6, '7147820240724AwhnBm7', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:39', '2024-07-24 12:47:39'),
@@ -796,12 +798,12 @@ INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`
 (1479, 4, 6, '8815420240724iskxYhp', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
 (1480, 4, 6, '1981820240724ZwYstLx', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
 (1481, 4, 6, '4582220240724iJDGaHI', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
-(1482, 4, 6, '6142820240724MZVREF0', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43');
-INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`, `status`, `receipt_no`, `points`, `amount`, `phone`, `created_at`, `updated_at`) VALUES
+(1482, 4, 6, '6142820240724MZVREF0', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
 (1483, 4, 6, '1286320240724EzGAO03', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
 (1484, 4, 6, '5781120240724hpZPdli', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
 (1485, 4, 6, '3832720240724baeS67G', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
-(1486, 4, 6, '5152120240724kLgsMRa', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
+(1486, 4, 6, '5152120240724kLgsMRa', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43');
+INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`, `status`, `receipt_no`, `points`, `amount`, `phone`, `created_at`, `updated_at`) VALUES
 (1487, 4, 6, '1164420240724kBVOFfb', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
 (1488, 4, 6, '5092720240724D0KAi52', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
 (1489, 4, 6, '8687020240724MovUGrJ', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:43', '2024-07-24 12:47:43'),
@@ -1267,12 +1269,12 @@ INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`
 (1949, 4, 6, '4395920240724Oa1RcGb', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (1950, 4, 6, '7248320240724QtlhF1y', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (1951, 4, 6, '6042820240724gdRJi4L', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
-(1952, 4, 6, '9619620240724p5fihwq', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44');
-INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`, `status`, `receipt_no`, `points`, `amount`, `phone`, `created_at`, `updated_at`) VALUES
+(1952, 4, 6, '9619620240724p5fihwq', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (1953, 4, 6, '2381820240724zb9qJdZ', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (1954, 4, 6, '8315820240724d0hpRKH', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (1955, 4, 6, '5003220240724TCeuzJG', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
-(1956, 4, 6, '88423202407247HrBSlY', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
+(1956, 4, 6, '88423202407247HrBSlY', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44');
+INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`, `status`, `receipt_no`, `points`, `amount`, `phone`, `created_at`, `updated_at`) VALUES
 (1957, 4, 6, '35270202407249iFa5Nf', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (1958, 4, 6, '3902720240724nA6Ccbo', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (1959, 4, 6, '42396202407241gKNfbe', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
@@ -1328,7 +1330,21 @@ INSERT INTO `voucher_generateds` (`id`, `user_id`, `campaign_managed_id`, `code`
 (2009, 4, 6, '4367520240724hie5A49', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (2010, 4, 6, '5994920240724cxtR4uI', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
 (2011, 4, 6, '4754020240724nxh4qdR', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
-(2012, 4, 6, '4708920240724hUSvXVn', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44');
+(2012, 4, 6, '4708920240724hUSvXVn', 0, NULL, '2', 10, NULL, '2024-07-24 12:47:44', '2024-07-24 12:47:44'),
+(2013, 1, 5, '3982020240726pjSZhR4', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:35', '2024-07-26 13:41:35'),
+(2014, 1, 5, '3275620240726OhY8PW6', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:35', '2024-07-26 13:41:35'),
+(2015, 1, 5, '9439320240726u7G6mTl', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:35', '2024-07-26 13:41:35'),
+(2016, 1, 5, '2895720240726rQ1qxel', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:35', '2024-07-26 13:41:35'),
+(2017, 1, 5, '4200920240726i7F5rku', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:35', '2024-07-26 13:41:35'),
+(2018, 1, 5, '87995202407268EYu1qQ', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:35', '2024-07-26 13:41:35'),
+(2019, 1, 5, '8479220240726kiTGsJw', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:35', '2024-07-26 13:41:35'),
+(2020, 1, 5, '2710720240726khSzrdo', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:36', '2024-07-26 13:41:36'),
+(2021, 1, 5, '8539620240726kzR0nvf', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:36', '2024-07-26 13:41:36'),
+(2022, 1, 5, '66852202407261bIXEVZ', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:36', '2024-07-26 13:41:36'),
+(2023, 1, 5, '6229020240726EWnU3J7', 0, NULL, '5', 600, NULL, '2024-07-26 13:41:36', '2024-07-26 13:41:36'),
+(2024, 1, 5, '1852024073vJEBNw', 1, '123346', '8', 1000, NULL, '2024-07-27 08:19:52', '2024-07-27 08:19:52'),
+(2025, 1, 8, 'sAeO0f6q0wdi', 1, NULL, '2', 2300, NULL, '2024-07-30 12:59:46', '2024-07-30 12:59:46'),
+(2026, 1, 5, 'q7ovEd0KYZcR', 1, NULL, '25', 3000, NULL, '2024-07-30 14:13:26', '2024-07-30 14:13:26');
 
 -- --------------------------------------------------------
 
@@ -1371,7 +1387,8 @@ CREATE TABLE `voucher_reward_useds` (
 --
 
 INSERT INTO `voucher_reward_useds` (`id`, `code`, `status`, `user_id`, `campaign_id`, `campaign_managed_id`, `reward_id`, `created_at`, `updated_at`) VALUES
-(1, 'JrC3sTA8In', 'Used', 4, 1, 5, 3, '2024-07-24 09:18:23', '2024-07-24 09:18:23');
+(1, 'JrC3sTA8In', 'Used', 4, 1, 5, 3, '2024-07-24 09:18:23', '2024-07-24 09:18:23'),
+(2, 'BvsJmIlMzK', 'Used', 1, 2, 6, 4, '2024-07-30 13:15:11', '2024-07-30 13:15:11');
 
 -- --------------------------------------------------------
 
@@ -1399,7 +1416,11 @@ INSERT INTO `voucher_useds` (`id`, `code`, `points`, `voucher_generated_id`, `ca
 (3, '62202407LXno1gW', 7, 9, 5, '2024-07-05 15:29:06', '2024-07-05 15:29:06'),
 (4, '494202407y0weDuE', 10, 11, 5, '2024-07-08 11:44:54', '2024-07-08 11:44:54'),
 (5, '43202407BtAVF2o', NULL, 3, 5, '2024-07-08 14:40:52', '2024-07-08 14:40:52'),
-(6, '848202407Jc62NTK', 12, 7, 5, '2024-07-08 14:42:16', '2024-07-08 14:42:16');
+(6, '848202407Jc62NTK', 12, 7, 5, '2024-07-08 14:42:16', '2024-07-08 14:42:16'),
+(7, '4347120240724jNFL2K5', 2, 1014, 6, '2024-07-27 08:13:46', '2024-07-27 08:13:46'),
+(8, '4700020240724QKW5ZAD', 2, 1017, 6, '2024-07-27 08:17:28', '2024-07-27 08:17:28'),
+(9, '89329202407244kIO1Cv', 2, 1023, 6, '2024-07-27 09:16:16', '2024-07-27 09:16:16'),
+(10, '6595320240724Nz0JesK', 2, 1019, 6, '2024-07-27 10:35:00', '2024-07-27 10:35:00');
 
 --
 -- Indexes for dumped tables
@@ -1479,7 +1500,8 @@ ALTER TABLE `users`
 -- Indexes for table `voucher_generateds`
 --
 ALTER TABLE `voucher_generateds`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
 
 --
 -- Indexes for table `voucher_rewards`
@@ -1513,13 +1535,13 @@ ALTER TABLE `app_infos`
 -- AUTO_INCREMENT for table `campaigns`
 --
 ALTER TABLE `campaigns`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `campaign_manageds`
 --
 ALTER TABLE `campaign_manageds`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -1537,19 +1559,19 @@ ALTER TABLE `migrations`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `prices`
 --
 ALTER TABLE `prices`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `rewards`
 --
 ALTER TABLE `rewards`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1567,25 +1589,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `voucher_generateds`
 --
 ALTER TABLE `voucher_generateds`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2013;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2027;
 
 --
 -- AUTO_INCREMENT for table `voucher_rewards`
 --
 ALTER TABLE `voucher_rewards`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `voucher_reward_useds`
 --
 ALTER TABLE `voucher_reward_useds`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `voucher_useds`
 --
 ALTER TABLE `voucher_useds`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
