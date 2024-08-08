@@ -88,7 +88,7 @@ class CampaignManagedController extends Controller
         $data->total = $request->total;
         //$data->start_date = $request->start_date;
         //$data->end_date = $request->end_date;
-        $data->num_of_days = $request->num_pf_days;
+        $data->num_of_days = $request->num_of_days;
         $data->company_name = $request->company_name;
         $data->company_phone = $request->company_phone;
         $data->company_address = $request->company_address;

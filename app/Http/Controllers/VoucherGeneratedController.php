@@ -140,6 +140,13 @@ class VoucherGeneratedController extends Controller
             $voucher->delete();
         }
         $reward = Reward::where('campaign_managed_id', $request->campaign_managed_id)->first();
+        if( (int)$reward->price_per_voucher > (int)$request->amount ){
+            return response()->json([
+                'status' => 0,
+                'message' => 'Voucher cannot be issued when amount is below Minimum amount required.',
+                'price_per_voucher' => (int)$reward->price_per_voucher,
+            ]);
+        }
         $points = ((int)$request->amount / $reward->price_per_voucher) * $reward->points_per_voucher;
         $code = $this->generateRandomText(12);
         $user_id = Auth::user()->id;
@@ -150,7 +157,7 @@ class VoucherGeneratedController extends Controller
         $data->campaign_managed_id = $request->campaign_managed_id;
         $data->receipt_no = $request->receipt_no;
         $data->phone = $request->phone;
-        $data->points = round($points);
+        $data->points = floor($points);
         $data->amount = $request->amount;
         $data->status = 1;
         $data->updated_at = now();
