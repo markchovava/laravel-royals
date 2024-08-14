@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
             'role' => new RoleResource($this->whenLoaded('role')),
+            'user_author' => new UserAuthorResource($this->whenLoaded('user_author')),
         ];
     }
 }

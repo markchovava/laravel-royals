@@ -4,8 +4,10 @@ use App\Http\Controllers\AppInfoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\CampaignManagedController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserAuthorController;
 use App\Http\Controllers\VoucherGeneratedController;
 use App\Http\Controllers\VoucherRewardController;
 use App\Models\AppInfo;
@@ -40,6 +42,7 @@ Route::prefix('campaign')->group(function() {
     Route::get('/{id}', [CampaignController::class, 'view']);
 });
 Route::get('/campaign-all', [CampaignController::class, 'indexAll']);
+
 /* CAMPAIGN-MANAGED */
 Route::prefix('campaign-managed')->group(function() {
     Route::get('/', [CampaignManagedController::class, 'index']);
@@ -47,12 +50,18 @@ Route::prefix('campaign-managed')->group(function() {
 });
 Route::get('/campaign-managed-all', [CampaignManagedController::class, 'indexAll']);
 Route::post('/campaign-managed-status/{id}', [CampaignManagedController::class, 'statusUpdate']);
+
 /* ROLE */
 Route::prefix('role')->group(function() {
     Route::get('/', [RoleController::class, 'index']);
     Route::get('/{id}', [RoleController::class, 'view']);
 });
 Route::get('/role-all', [RoleController::class, 'indexAll']);
+
+Route::prefix('permission')->group(function() {
+    Route::get('/', [PermissionController::class, 'index']);
+    Route::get('/{id}', [PermissionController::class, 'view']);
+});
 /* PRICE */
 Route::prefix('price')->group(function() {
     Route::get('/', [PriceController::class, 'index']);
@@ -60,6 +69,13 @@ Route::prefix('price')->group(function() {
 });
 Route::get('/price-all', [PriceController::class, 'indexAll']);
 Route::get('/price-priority-one', [PriceController::class, 'priorityOne']);
+
+/* USER AUTHOR */
+Route::prefix('user-author')->group(function() {
+    Route::get('/', [UserAuthorController::class, 'index']);
+    Route::get('/{id}', [UserAuthorController::class, 'view']);
+});
+
 /* VOUCHER-GENERATED */
 Route::get('/voucher-generated-search-by-code', [VoucherGeneratedController::class, 'searchByCode']);
 

@@ -16,6 +16,16 @@ class UserController extends Controller
         return substr($shuffled, 0, $length);
     }
 
+    public function searchByEmail(Request $request) {
+        if(!empty($request->email)){
+            $data = User::where('email', 'LIKE', '%' . $request->email . '%')->get();
+            return UserResource::collection($data);
+        }
+        return response()->json([
+            'data' => [],
+        ]);
+    }
+
     public function index(Request $request){
         $user_id = Auth::user()->id;
         if(!empty($request->search)){

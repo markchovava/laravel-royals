@@ -6,6 +6,8 @@ use App\Http\Resources\CampaignManagedResource;
 use App\Http\Resources\RewardResource;
 use App\Models\CampaignManaged;
 use App\Models\Reward;
+use App\Models\User;
+use App\Models\UserAuthor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -40,6 +42,39 @@ class CampaignManagedController extends Controller
             'status' => 1,
             'message' => 'Saved successfully.'
         ]);
+    }
+
+    public function indexByAuthorUser(Request $request){
+        $user_id = Auth::user()->id;
+        $authorIds = UserAuthor::where('user_id', $user_id)->pluck('author_id');
+        $combinedIds = $authorIds;
+        $combinedIds[] = $user_id;
+        if(!empty($authorIds)) {
+            if(!empty($request->search)){
+                $data = CampaignManaged::whereIn('user_id', $combinedIds)
+                        ->where('name', 'LIKE', '%' . $request->search . '%')
+                        ->orderBy('updated_at', 'desc')
+                        ->paginate(12);
+                return CampaignManagedResource::collection($data);
+            }
+            $data = CampaignManaged::whereIn('user_id', $combinedIds)
+                    ->orderBy('updated_at', 'desc')
+                    ->paginate(12);
+            return CampaignManagedResource::collection($data);
+        }
+        if(!empty($request->search)){
+            $data = CampaignManaged::where('user_id', $user_id)
+                    ->where('name', 'LIKE', '%' . $request->search . '%')
+                    ->orderBy('updated_at', 'desc')
+                    ->paginate(12);
+            return CampaignManagedResource::collection($data);
+        }
+        $data = CampaignManaged::where('user_id', $user_id)
+                ->orderBy('updated_at', 'desc')
+                ->paginate(12);
+        Log::info('no $authorIds');
+        Log::info($data);
+        return CampaignManagedResource::collection($data);
     }
 
     public function indexByUserActive(){
@@ -78,6 +113,11 @@ class CampaignManagedController extends Controller
 
     public function store(Request $request){
         $user_id = Auth::user()->id;
+        $user = User::find($user_id);
+        if($user->role_level > 2){
+            $user->role_level = 2;
+            $user->save();
+        }
         $data = new CampaignManaged();
         $data->status = 'Processing';
         $data->user_id = $user_id;

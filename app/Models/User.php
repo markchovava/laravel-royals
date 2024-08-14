@@ -35,6 +35,15 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_level', 'level');
     }
 
+    public function user_author(){
+        return $this->hasOne(UserAuthor::class, 'user_id', 'id');
+    }
+
+    public function permissions(){
+        return $this->belongsToMany(Permission::class, 'user_permissions', 'user_id', 'permission_id')
+            ->withTimestamps();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
