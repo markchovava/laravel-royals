@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'role_level' => $this->role_level,
             'password' => $this->password,
-            'code' => $this->code,
+            /* 'code' => $this->code, */
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
             'role' => new RoleResource($this->whenLoaded('role')),

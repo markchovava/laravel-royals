@@ -10,7 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserAuthorController;
 use App\Http\Controllers\VoucherGeneratedController;
 use App\Http\Controllers\VoucherRewardController;
-use App\Models\AppInfo;
+use App\Http\Controllers\VoucherRewardUsedController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +27,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+/* BOT */
+Route::post('/bot-register', [AuthController::class, 'bot_register']);
+Route::get('/bot-voucher-generated-search-by-code', [VoucherGeneratedController::class, 'bot_searchByCode']);
+Route::post('/bot-campaign-store-by-points', [CampaignController::class, 'bot_storeByPoints']);
+Route::get('/bot-campaign-list-by-user', [CampaignController::class, 'bot_indexByUser']);
+Route::get('/bot-voucher-reward-search-by-code', [VoucherRewardController::class, 'bot_searchByCode']);
+Route::post('/bot-voucher-reward-used', [VoucherRewardUsedController::class, 'bot_store']);
 
 
 Route::post('/login', [AuthController::class, 'login']);

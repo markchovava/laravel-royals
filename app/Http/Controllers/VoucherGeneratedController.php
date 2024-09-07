@@ -20,6 +20,44 @@ class VoucherGeneratedController extends Controller
         return substr($shuffled, 0, $length);
     }
 
+    public function bot_searchByCode(Request $request){
+        if(!empty($request->search)){
+            $data = VoucherGenerated::with(['user', 'campaign_managed'])
+                    ->where('code', $request->search)
+                    ->first();
+            if(!isset($data)){
+                return response()->json([
+                    'status' => 0,
+                    'data' => [],
+                    'message' => 'Voucher is not available.'
+                ]);
+            }
+            return response()->json([
+                'status' => 1,
+                'data' => new VoucherGeneratedResource($data),
+            ]);
+        }
+    }
+
+    public function searchByCode(Request $request){
+        if(!empty($request->search)){
+            $data = VoucherGenerated::with(['user', 'campaign_managed'])
+                    ->where('code', $request->search)
+                    ->first();
+            if(!isset($data)){
+                return response()->json([
+                    'status' => 0,
+                    'data' => [],
+                    'message' => 'Voucher not found.'
+                ]);
+            }
+            return response()->json([
+                'status' => 1,
+                'data' => new VoucherGeneratedResource($data),
+            ]);
+        }
+    }
+
     public function checkVoucherByCampaignManagedId(Request $request){
         Log::info('$request->campaign_managed_id');
         Log::info($request->campaign_managed_id);
@@ -74,25 +112,6 @@ class VoucherGeneratedController extends Controller
                     ->paginate(12);
         }
         return VoucherGeneratedResource::collection($data);
-    }
-
-    public function searchByCode(Request $request){
-        if(!empty($request->search)){
-            $data = VoucherGenerated::with(['user', 'campaign_managed'])
-                    ->where('code', $request->search)
-                    ->first();
-            if(!isset($data)){
-                return response()->json([
-                    'status' => 0,
-                    'data' => [],
-                    'message' => 'Voucher not found.'
-                ]);
-            }
-            return response()->json([
-                'status' => 1,
-                'data' => new VoucherGeneratedResource($data),
-            ]);
-        }
     }
 
     public function indexByCampaignCSV(Request $request, $id){

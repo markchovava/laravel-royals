@@ -11,6 +11,35 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    public function generateRandomText($length = 8) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $shuffled = str_shuffle($characters);
+        return substr($shuffled, 0, $length);
+    }
+
+    public function bot_register(Request $request){
+        if(User::where('phone', $request->phone)->first()){
+            return response()->json([
+                'status' => 0,
+                'message' => 'Phone Number is already used, please try a different one.',
+            ]);
+        }
+        $data = new User();
+        $data->role_level = 4;
+        $data->phone = $request->phone;
+        $data->name = $request->name;
+        $data->email = $request->phone;
+        $data->code = $this->generateRandomText();
+        $data->password = Hash::make($data->code);
+        $data->save();
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Created Successfully.',
+            'data' => new UserResource($data),
+            'password' => $data->code,
+        ]);
+    }
 
     public function password(Request $request){
         $user_id = Auth::user()->id;
@@ -58,7 +87,7 @@ class AuthController extends Controller
             ]);
         }
         $data = new User();
-        $data->role_level = 1;
+        $data->role_level = 4;
         $data->email = $request->email;
         $data->code = $request->password;
         $data->password = Hash::make($request->password);

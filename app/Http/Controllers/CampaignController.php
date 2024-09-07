@@ -27,10 +27,123 @@ class CampaignController extends Controller
         return substr($shuffled, 0, $length);
     }
 
+
+    public function bot_storeByPoints(Request $request){
+        $user = User::where('phone', $request->phone)->first();
+        $reward = Reward::where('campaign_managed_id', $request->campaign_managed_id)->first();
+        if(!isset($reward)){
+            return response()->json([
+                'status' => 0,
+                'message' => 'Something went wrong on rewards.'
+            ]);
+        }
+        if(!isset($user)){
+            /* USER */
+            $code  = date('Ymd');
+            $user = new User();
+            $user->phone = $request->phone;
+            $user->email = $request->phone;
+            $user->code = $code;
+            $user->password = Hash::make($code);
+            $user->save();
+            /* CAMAPAIGN */
+            $campaign = new Campaign();
+            $campaign->campaign_managed_id = $request->campaign_managed_id;
+            $campaign->user_id = $user->id;
+            $campaign->current_points = $request->points;
+            $campaign->current_quantity = $request->quantity;
+            $campaign->reward_id = $reward->id;
+            $campaign->save();
+            /* VOUCHER */
+            $voucher = new VoucherUsed();
+            $voucher->voucher_generated_id = $request->voucher_generated_id;
+            $voucher->code = $request->code;
+            $voucher->points = $request->points;
+            $voucher->campaign_managed_id = $request->campaign_managed_id;
+            $voucher->save();
+            VoucherGenerated::find($request->voucher_generated_id)->delete();
+            /* Subtract one */
+            $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
+            $campaign_managed->quantity_remaining -= 1;
+            $campaign_managed->save();
+            return response()->json([
+                'status' => 1,
+                'message' => 'New User and Campaign created successfully.',
+                'data' => new CampaignResource($campaign),
+            ]);
+        }
+        /*  */
+        $campaign = Campaign::where('user_id', $user->id)
+                    ->where('campaign_managed_id', $request->campaign_managed_id)
+                    ->first();
+        if(!isset($campaign)){
+            /* CAMAPAIGN */
+            $campaign = new Campaign();
+            $campaign->campaign_managed_id = $request->campaign_managed_id;
+            $campaign->user_id = $user->id;
+            $campaign->current_points = $request->points;
+            $campaign->current_quantity = $request->quantity;
+            $campaign->reward_id = $reward->id;
+            $campaign->save();
+            /* VOUCHER */
+            $voucher = new VoucherUsed();
+            $voucher->voucher_generated_id = $request->voucher_generated_id;
+            $voucher->code = $request->code;
+            $voucher->points = $request->points;
+            $voucher->campaign_managed_id = $request->campaign_managed_id;
+            $voucher->save();
+            VoucherGenerated::find($request->voucher_generated_id)->delete();
+             /* Subtract one */
+             $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
+             $campaign_managed->quantity_remaining -= 1;
+             $campaign_managed->save();
+            return response()->json([
+                'status' => 1,
+                'message' => 'Campaign created successfully.',
+                'data' => new CampaignResource($campaign),
+            ]);
+        }
+        /*  */
+        $campaign->current_points += $request->points;
+        $campaign->current_quantity += (int)$request->quantity;
+        $campaign->save();
+        /* VOUCHER */
+        $voucher = new VoucherUsed();
+        $voucher->voucher_generated_id = $request->voucher_generated_id;
+        $voucher->code = $request->code;
+        $voucher->points = (int)$request->points;
+        $voucher->campaign_managed_id = $request->campaign_managed_id;
+        $voucher->save();
+        VoucherGenerated::find($request->voucher_generated_id)->delete();
+         /* Subtract one */
+         $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
+         $campaign_managed->quantity_remaining -= 1;
+         $campaign_managed->save();
+        return response()->json([
+            'status' => 1,
+            'message' => 'Campaign saved successfully.',
+            'data' => new CampaignResource($campaign)
+        ]);
+
+
+    }
+
     public function indexAll(){
         $data = Campaign::with(['user', 'campaign_managed', 'reward'])->get();
         return CampaignResource::collection($data);
     }
+
+
+    public function bot_indexByUser(Request $request){
+        $user = User::where('phone', $request->phone)->first();
+        $data = Campaign::with(['user', 'campaign_managed', 'reward'])
+                ->where('user_id', $user->id)
+                ->orderBy('updated_at', 'desc')
+                ->paginate(12);
+        
+        return CampaignResource::collection($data);
+    }
+
 
     public function indexByUser(Request $request){
         $user_id = Auth::user()->id;
