@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CampaignManagedResource;
 use App\Http\Resources\CampaignResource;
 use App\Http\Resources\RewardResource;
+use App\Http\Resources\VoucherGeneratedResource;
 use App\Http\Resources\VoucherRewardResource;
+use App\Http\Resources\VoucherUsedResource;
 use App\Models\Campaign;
 use App\Models\CampaignManaged;
 use App\Models\Reward;
@@ -28,122 +30,135 @@ class CampaignController extends Controller
     }
 
 
-    public function bot_storeByPoints(Request $request){
-        $user = User::where('phone', $request->phone)->first();
-        $reward = Reward::where('campaign_managed_id', $request->campaign_managed_id)->first();
-        if(!isset($reward)){
-            return response()->json([
-                'status' => 0,
-                'message' => 'Something went wrong on rewards.'
-            ]);
-        }
-        if(!isset($user)){
-            /* USER */
-            $code  = date('Ymd');
-            $user = new User();
-            $user->phone = $request->phone;
-            $user->email = $request->phone;
-            $user->code = $code;
-            $user->password = Hash::make($code);
-            $user->save();
-            /* CAMAPAIGN */
-            $campaign = new Campaign();
-            $campaign->campaign_managed_id = $request->campaign_managed_id;
-            $campaign->user_id = $user->id;
-            $campaign->current_points = $request->points;
-            $campaign->current_quantity = $request->quantity;
+    public function bot_addPointsToCampaign(Request $request) {
+        if(!empty($request->code) && !empty($request->phone)){
+            $voucher = VoucherGenerated::where('code', $request->code)->first();
+            if(!isset($voucher)) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'Voucher is not available, try a different one.',
+                ]);
+            }
+            $user = User::where('phone', $request->phone)->first();
+            if(!isset($user)) {
+                return response()->json([
+                    'status' => -3,
+                    'message' => 'User not registered, please register before adding points.',
+                ]);
+            }
+            $reward = Reward::where('campaign_managed_id', $voucher->campaign_managed_id)->first();
+            if(!isset($reward)){
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'Something went wrong on rewards.'
+                ]);
+            }
+            $campaign = Campaign::where('user_id', $user->id)
+                        ->where('campaign_managed_id', $voucher->campaign_managed_id)
+                        ->first();
+            if(!isset($campaign)) {
+                $campaign = new Campaign();
+                $campaign->campaign_managed_id = $voucher->campaign_managed_id;
+                $campaign->user_id = $user->id;
+                $campaign->current_points = $reward->points_per_voucher;
+                $campaign->current_quantity = 1;
+                $campaign->reward_id = $reward->id;
+                $campaign->updated_at = now();
+                $campaign->created_at = now();
+                $campaign->save();
+                /* VOUCHER */
+                $voucher_used = new VoucherUsed();
+                $voucher_used->voucher_generated_id = $voucher->id;
+                $voucher_used->code = $request->code;
+                $voucher_used->points = $voucher->points;
+                $voucher_used->campaign_managed_id = $voucher->campaign_managed_id;
+                $voucher_used->updated_at = now();
+                $voucher_used->created_at = now();
+                $voucher_used->save();
+                VoucherGenerated::find($voucher->id)->delete();
+                /* Subtract one */
+                $campaign_managed = CampaignManaged::find($voucher->campaign_managed_id);
+                $campaign_managed->quantity_remaining -= 1;
+                $campaign_managed->updated_at = now();
+                $campaign_managed->save();
+                $data = Campaign::with(['user', 'campaign_managed', 'reward'])->find($campaign->id);
+                return response()->json([
+                    'status' => 1,
+                    'message' => 'Campaign created successfully.',
+                    'data' => new CampaignResource($data),
+                    'voucher' => new VoucherUsedResource($voucher_used),
+                ]);
+            }
+            $campaign->current_points += $reward->points_per_voucher;
+            $campaign->current_quantity += 1;
             $campaign->reward_id = $reward->id;
+            $campaign->updated_at = now();
             $campaign->save();
             /* VOUCHER */
-            $voucher = new VoucherUsed();
-            $voucher->voucher_generated_id = $request->voucher_generated_id;
-            $voucher->code = $request->code;
-            $voucher->points = $request->points;
-            $voucher->campaign_managed_id = $request->campaign_managed_id;
-            $voucher->save();
-            VoucherGenerated::find($request->voucher_generated_id)->delete();
-            /* Subtract one */
-            $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
-            $campaign_managed->quantity_remaining -= 1;
-            $campaign_managed->save();
-            return response()->json([
-                'status' => 1,
-                'message' => 'New User and Campaign created successfully.',
-                'data' => new CampaignResource($campaign),
-            ]);
-        }
-        /*  */
-        $campaign = Campaign::where('user_id', $user->id)
-                    ->where('campaign_managed_id', $request->campaign_managed_id)
-                    ->first();
-        if(!isset($campaign)){
-            /* CAMAPAIGN */
-            $campaign = new Campaign();
-            $campaign->campaign_managed_id = $request->campaign_managed_id;
-            $campaign->user_id = $user->id;
-            $campaign->current_points = $request->points;
-            $campaign->current_quantity = $request->quantity;
-            $campaign->reward_id = $reward->id;
-            $campaign->save();
-            /* VOUCHER */
-            $voucher = new VoucherUsed();
-            $voucher->voucher_generated_id = $request->voucher_generated_id;
-            $voucher->code = $request->code;
-            $voucher->points = $request->points;
-            $voucher->campaign_managed_id = $request->campaign_managed_id;
-            $voucher->save();
-            VoucherGenerated::find($request->voucher_generated_id)->delete();
+            $voucher_used = new VoucherUsed();
+            $voucher_used->voucher_generated_id = $voucher->id;
+            $voucher_used->code = $request->code;
+            $voucher_used->points = $voucher->points;
+            $voucher_used->campaign_managed_id = $voucher->campaign_managed_id;
+            $voucher_used->updated_at = now();
+            $voucher_used->created_at = now();
+            $voucher_used->save();
+            VoucherGenerated::find($voucher->id)->delete();
              /* Subtract one */
-             $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
-             $campaign_managed->quantity_remaining -= 1;
-             $campaign_managed->save();
+            $campaign_managed = CampaignManaged::find($voucher->campaign_managed_id);
+            $campaign_managed->quantity_remaining -= 1;
+            $campaign_managed->updated_at = now();
+            $campaign_managed->save();
+            $data = Campaign::with(['user', 'campaign_managed', 'reward'])->find($campaign->id);
             return response()->json([
                 'status' => 1,
-                'message' => 'Campaign created successfully.',
-                'data' => new CampaignResource($campaign),
+                'message' => 'Campaign updated successfully.',
+                'data' => new CampaignResource($data),
+                'voucher' => new VoucherUsedResource($voucher_used),
             ]);
         }
-        /*  */
-        $campaign->current_points += $request->points;
-        $campaign->current_quantity += (int)$request->quantity;
-        $campaign->save();
-        /* VOUCHER */
-        $voucher = new VoucherUsed();
-        $voucher->voucher_generated_id = $request->voucher_generated_id;
-        $voucher->code = $request->code;
-        $voucher->points = (int)$request->points;
-        $voucher->campaign_managed_id = $request->campaign_managed_id;
-        $voucher->save();
-        VoucherGenerated::find($request->voucher_generated_id)->delete();
-         /* Subtract one */
-         $campaign_managed = CampaignManaged::find($request->campaign_managed_id);
-         $campaign_managed->quantity_remaining -= 1;
-         $campaign_managed->save();
         return response()->json([
-            'status' => 1,
-            'message' => 'Campaign saved successfully.',
-            'data' => new CampaignResource($campaign)
+            'status' => -1,
+            'message' => 'QR Code and phone number is required.'
         ]);
 
-
     }
+
+
+    public function bot_indexByUser(Request $request){
+        if(!empty($request->phone)) {
+            $user = User::where('phone', $request->phone)->first();
+            if(!isset($user)) {
+                return response()->json([
+                    'status' => -3,
+                    'message' => 'User not registered, you are required to register.',
+                ]);
+            }
+            $data = Campaign::with(['user', 'campaign_managed', 'reward'])
+                    ->where('user_id', $user->id)
+                    ->orderBy('updated_at', 'desc')
+                    ->paginate(12);
+            if(!isset($data)) {
+                return response()->json([
+                    'status' => 0,
+                    'data' => [],
+                    'message' => 'Phone number does not exist.'
+                ]);
+            }
+
+            return CampaignResource::collection($data);
+        }
+        return response()->json([
+            'status' => -1,
+            'message' => 'Phone number is required.'
+        ]);
+    }
+
 
     public function indexAll(){
         $data = Campaign::with(['user', 'campaign_managed', 'reward'])->get();
         return CampaignResource::collection($data);
     }
-
-
-    public function bot_indexByUser(Request $request){
-        $user = User::where('phone', $request->phone)->first();
-        $data = Campaign::with(['user', 'campaign_managed', 'reward'])
-                ->where('user_id', $user->id)
-                ->orderBy('updated_at', 'desc')
-                ->paginate(12);
-        
-        return CampaignResource::collection($data);
-    }
-
 
     public function indexByUser(Request $request){
         $user_id = Auth::user()->id;

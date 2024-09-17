@@ -37,6 +37,11 @@ class VoucherGeneratedController extends Controller
                 'data' => new VoucherGeneratedResource($data),
             ]);
         }
+        return response()->json([
+            'status' => 0,
+            'data' => [],
+            'message' => 'Something went wrong.'
+        ]);
     }
 
     public function searchByCode(Request $request){

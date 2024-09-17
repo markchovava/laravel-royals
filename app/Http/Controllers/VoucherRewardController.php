@@ -3,12 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\VoucherRewardResource;
+use App\Models\User;
 use App\Models\VoucherReward;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class VoucherRewardController extends Controller
 {
+
+    public function bot_indexByUser(Request $request){
+        if(!empty($request->phone)) {
+            $user = User::where('phone', $request->phone)->first();
+            if(!isset($user)) {
+                return response()->json([
+                    'status' => -3,
+                    'message' => 'User not registered, you are required to register.'
+                ]);
+            }
+            $data = VoucherReward::where('user_id', $user->id)->get();
+            if(!isset($data)) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'Reward vouchers not available.'
+                ]);
+            }
+            return response()->json([
+                'status' => 1,
+                'data' => VoucherRewardResource::collection($data),
+            ]);
+        }
+        return response()->json([
+            'status' => -1,
+            'message' => 'Phone number is required.'
+        ]);
+    
+    }
+
 
     public function bot_searchByCode(Request $request){
         if(!empty($request->search)){
