@@ -90,6 +90,7 @@ class AuthController extends Controller
         $data->role_level = 4;
         $data->email = $request->email;
         $data->code = $request->password;
+        $data->phone = $request->phone;
         $data->password = Hash::make($request->password);
         $data->save();
 
@@ -131,7 +132,8 @@ class AuthController extends Controller
     public function logout(){
         Auth::user()->currentAccessToken()->delete();
         return response()->json([
-            'message' => 'Log out succesfully.',
+            'status' => 1,
+            'message' => 'Logout Succesfully.',
         ]);
     }
 
