@@ -53,6 +53,13 @@ class CampaignController extends Controller
                     'message' => 'Something went wrong on rewards.'
                 ]);
             }
+            $campaign_managed = CampaignManaged::find($voucher->campaign_managed_id);
+            if($campaign_managed->status != 'Active') {
+                return response()->json([
+                    'status' => -4,
+                    'message' => 'The Campaign is not Acctive.'
+                ]);
+            }
             $campaign = Campaign::where('user_id', $user->id)
                         ->where('campaign_managed_id', $voucher->campaign_managed_id)
                         ->first();
@@ -60,7 +67,7 @@ class CampaignController extends Controller
                 $campaign = new Campaign();
                 $campaign->campaign_managed_id = $voucher->campaign_managed_id;
                 $campaign->user_id = $user->id;
-                $campaign->current_points = $reward->points_per_voucher;
+                $campaign->current_points = $voucher->points;
                 $campaign->current_quantity = 1;
                 $campaign->reward_id = $reward->id;
                 $campaign->updated_at = now();
@@ -89,7 +96,7 @@ class CampaignController extends Controller
                     'voucher' => new VoucherUsedResource($voucher_used),
                 ]);
             }
-            $campaign->current_points += $reward->points_per_voucher;
+            $campaign->current_points += $voucher->points;
             $campaign->current_quantity += 1;
             $campaign->reward_id = $reward->id;
             $campaign->updated_at = now();
@@ -110,6 +117,38 @@ class CampaignController extends Controller
             $campaign_managed->updated_at = now();
             $campaign_managed->save();
             $data = Campaign::with(['user', 'campaign_managed', 'reward'])->find($campaign->id);
+            /**
+             * 
+             *  CHECK IF TARGET REACHED,
+             *  In Campaign
+             *  
+             **/
+            if($campaign->current_points >= $reward->target_points){
+                $campaign->current_points -= $reward->target_points;
+                $campaign->updated_at = now();
+                $campaign->save();
+                /* REWARD VOUCHER */
+                $voucher = new VoucherReward();
+                $voucher->user_id = $user->id;
+                $voucher->code = $this->generateRandomText(8);
+                $voucher->status = 'Active';
+                $voucher->campaign_managed_id = $campaign_managed->id;
+                $voucher->campaign_id = $campaign->id;
+                $voucher->reward_id = $reward->id;
+                $voucher->created_at = now();
+                $voucher->updated_at = now();
+                $voucher->save();
+                $data = Campaign::with(['user', 'campaign_managed', 'reward'])->find($campaign->id);
+                $voucher_reward = VoucherReward::with(['campaign_managed', 'campaign', 'reward'])->find($voucher->id);
+
+                return response()->json([
+                    'status' => 2,
+                    'data' => new CampaignResource($data),
+                    'voucher_reward' => new VoucherRewardResource($voucher_reward),
+                    'voucher' => new VoucherUsedResource($voucher_used),
+                ]);
+
+            }
             return response()->json([
                 'status' => 1,
                 'message' => 'Campaign updated successfully.',
@@ -146,7 +185,11 @@ class CampaignController extends Controller
                 ]);
             }
 
-            return CampaignResource::collection($data);
+            return response()->json([
+                'status' => 1,
+                'message' => 'User Campaigns found.',
+                'data' => CampaignResource::collection($data),
+            ]);
         }
         return response()->json([
             'status' => -1,

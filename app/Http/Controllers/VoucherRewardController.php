@@ -20,7 +20,7 @@ class VoucherRewardController extends Controller
                     'message' => 'User not registered, you are required to register.'
                 ]);
             }
-            $data = VoucherReward::where('user_id', $user->id)->get();
+            $data = VoucherReward::with(['reward', 'campaign_managed', 'campaign'])->where('user_id', $user->id)->get();
             if(!isset($data)) {
                 return response()->json([
                     'status' => 0,
@@ -62,6 +62,8 @@ class VoucherRewardController extends Controller
             'message' => 'Something went wrong.',
         ]);
     }
+
+
     public function searchByCode(Request $request){
         if(!empty($request->search)){
             $data = VoucherReward::with(['user', 'campaign_managed', 'reward'])
