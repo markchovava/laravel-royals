@@ -133,7 +133,7 @@ class AuthController extends Controller
         Auth::user()->currentAccessToken()->delete();
         return response()->json([
             'status' => 1,
-            'message' => 'Logout Succesfully.',
+            'message' => 'Logged out Succesfully.',
         ]);
     }
 
